@@ -6,9 +6,11 @@ import docx
 import pdfplumber
 from wordcloud import WordCloud
 import nltk
+import textblob
 
 # Download required corpora silently
 nltk.download('punkt', quiet=True)
+textblob.download_corpora()
 
 # -------------------------------
 # Function to extract text
