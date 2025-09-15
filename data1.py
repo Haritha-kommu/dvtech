@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 from collections import Counter
 from textblob import TextBlob
 import docx
-import fitz  # PyMuPDF
+import pdfplumber  # Replacing fitz
 
 # -------------------------------
 # Function to extract text
@@ -19,9 +19,9 @@ def extract_text_from_file(uploaded_file):
             text += para.text + " "
 
     elif uploaded_file.name.endswith(".pdf"):
-        pdf = fitz.open(stream=uploaded_file.read(), filetype="pdf")
-        for page in pdf:
-            text += page.get_text("text")
+        with pdfplumber.open(uploaded_file) as pdf:
+            for page in pdf.pages:
+                text += page.extract_text() or ""
 
     return text.strip()
 
@@ -53,7 +53,7 @@ if uploaded_file:
         ax.set_xlabel("Words")
         ax.set_ylabel("Count")
         st.pyplot(fig)
-        # -------------------------------
+
         # -------------------------------
         # Sentiment Analysis (Pie Chart)
         # -------------------------------
@@ -77,8 +77,7 @@ if uploaded_file:
                 startangle=90,
                 colors=["green", "red", "gray"])
         ax2.set_title("Sentiment Analysis")
-    st.pyplot(fig2)
+        st.pyplot(fig2)
+
     import textblob
     textblob.download_corpora()
-
-
