@@ -4,14 +4,11 @@ from collections import Counter
 from textblob import TextBlob
 import docx
 import pdfplumber
+from wordcloud import WordCloud
 import nltk
 
-# Ensure required corpora are available
-try:
-    import textblob
-    textblob.download_corpora()
-except Exception:
-    nltk.download('punkt')
+# Download required corpora silently
+nltk.download('punkt', quiet=True)
 
 # -------------------------------
 # Function to extract text
@@ -55,39 +52,44 @@ if uploaded_file:
         common_words = word_counts.most_common(10)
 
         labels, values = zip(*common_words)
-        fig, ax = plt.subplots()
-        ax.bar(labels, values, color="orange")
-        ax.set_title("Top 10 Word Frequencies")
-        ax.set_xlabel("Words")
-        ax.set_ylabel("Count")
-        st.pyplot(fig)
+        fig_bar, ax_bar = plt.subplots()
+        ax_bar.bar(labels, values, color="orange")
+        ax_bar.set_title("Top 10 Word Frequencies")
+        ax_bar.set_xlabel("Words")
+        ax_bar.set_ylabel("Count")
+        st.pyplot(fig_bar)
+
+        # -------------------------------
+        # Word Cloud Visualization
+        # -------------------------------
+        st.subheader("☁️ Word Cloud")
+        wordcloud = WordCloud(width=800, height=400, background_color='white').generate(text)
+        fig_wc, ax_wc = plt.subplots(figsize=(10, 5))
+        ax_wc.imshow(wordcloud, interpolation='bilinear')
+        ax_wc.axis("off")
+        st.pyplot(fig_wc)
 
         # -------------------------------
         # Sentiment Analysis (Pie Chart)
         # -------------------------------
-        try:
-            blob = TextBlob(text)
-            sentences = blob.sentences
+        blob = TextBlob(text)
+        sentences = blob.sentences
 
-            pos, neg, neu = 0, 0, 0
-            for s in sentences:
-                polarity = s.sentiment.polarity
-                if polarity > 0:
-                    pos += 1
-                elif polarity < 0:
-                    neg += 1
-                else:
-                    neu += 1
+        pos, neg, neu = 0, 0, 0
+        for s in sentences:
+            polarity = s.sentiment.polarity
+            if polarity > 0:
+                pos += 1
+            elif polarity < 0:
+                neg += 1
+            else:
+                neu += 1
 
-            fig2, ax2 = plt.subplots()
-            ax2.pie([pos, neg, neu],
-                    labels=["Positive", "Negative", "Neutral"],
-                    autopct="%1.1f%%",
-                    startangle=90,
-                    colors=["green", "red", "gray"])
-            ax2.set_title("Sentiment Analysis")
-            st.pyplot(fig2)
-
-        except Exception as e:
-            st.error("⚠️ Sentiment analysis failed. Please ensure required corpora are available.")
-            st.text(str(e))
+        fig_pie, ax_pie = plt.subplots()
+        ax_pie.pie([pos, neg, neu],
+                   labels=["Positive", "Negative", "Neutral"],
+                   autopct="%1.1f%%",
+                   startangle=90,
+                   colors=["green", "red", "gray"])
+        ax_pie.set_title("Sentiment Analysis")
+        st.pyplot(fig_pie)
