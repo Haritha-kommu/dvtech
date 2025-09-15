@@ -5,12 +5,6 @@ from textblob import TextBlob
 import docx
 import pdfplumber
 from wordcloud import WordCloud
-import nltk
-import textblob
-
-# Download required corpora silently
-nltk.download('punkt', quiet=True)
-textblob.download_corpora()
 
 # -------------------------------
 # Function to extract text
@@ -35,7 +29,7 @@ def extract_text_from_file(uploaded_file):
 # -------------------------------
 # Streamlit App
 # -------------------------------
-st.title("📊 Document Visualization App")
+st.title("📊 Document Visualization")
 
 uploaded_file = st.file_uploader("Upload a PDF, DOCX, or TXT file", type=["pdf", "docx", "txt"])
 
@@ -43,8 +37,8 @@ if uploaded_file:
     text = extract_text_from_file(uploaded_file)
 
     if text:
-        st.subheader("📄 Extracted Text Preview")
-        st.write(text[:500] + "...")  # Show first 500 characters
+        st.subheader("📄 Text Preview")
+        st.write(text[:500] + "...")
 
         # -------------------------------
         # Word Frequency (Bar Chart)
@@ -62,7 +56,7 @@ if uploaded_file:
         st.pyplot(fig_bar)
 
         # -------------------------------
-        # Word Cloud Visualization
+        # Word Cloud
         # -------------------------------
         st.subheader("☁️ Word Cloud")
         wordcloud = WordCloud(width=800, height=400, background_color='white').generate(text)
@@ -74,12 +68,9 @@ if uploaded_file:
         # -------------------------------
         # Sentiment Analysis (Pie Chart)
         # -------------------------------
-        blob = TextBlob(text)
-        sentences = blob.sentences
-
         pos, neg, neu = 0, 0, 0
-        for s in sentences:
-            polarity = s.sentiment.polarity
+        for sentence in text.split("."):
+            polarity = TextBlob(sentence).sentiment.polarity
             if polarity > 0:
                 pos += 1
             elif polarity < 0:
