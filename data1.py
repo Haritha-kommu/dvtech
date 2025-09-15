@@ -78,4 +78,7 @@ if uploaded_file:
                 colors=["green", "red", "gray"])
         ax2.set_title("Sentiment Analysis")
     st.pyplot(fig2)
+    import textblob
+    textblob.download_corpora()
+
 
