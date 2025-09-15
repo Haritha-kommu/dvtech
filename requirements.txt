@@ -3,3 +3,6 @@ matplotlib
 textblob
 python-docx
 pdfplumber
+nltk
+wordcloud
+seaborn
