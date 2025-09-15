@@ -3,7 +3,15 @@ import matplotlib.pyplot as plt
 from collections import Counter
 from textblob import TextBlob
 import docx
-import pdfplumber  # Replacing fitz
+import pdfplumber
+import nltk
+
+# Ensure required corpora are available
+try:
+    import textblob
+    textblob.download_corpora()
+except Exception:
+    nltk.download('punkt')
 
 # -------------------------------
 # Function to extract text
@@ -57,27 +65,29 @@ if uploaded_file:
         # -------------------------------
         # Sentiment Analysis (Pie Chart)
         # -------------------------------
-        blob = TextBlob(text)
-        sentences = blob.sentences
+        try:
+            blob = TextBlob(text)
+            sentences = blob.sentences
 
-        pos, neg, neu = 0, 0, 0
-        for s in sentences:
-            polarity = s.sentiment.polarity
-            if polarity > 0:
-                pos += 1
-            elif polarity < 0:
-                neg += 1
-            else:
-                neu += 1
+            pos, neg, neu = 0, 0, 0
+            for s in sentences:
+                polarity = s.sentiment.polarity
+                if polarity > 0:
+                    pos += 1
+                elif polarity < 0:
+                    neg += 1
+                else:
+                    neu += 1
 
-        fig2, ax2 = plt.subplots()
-        ax2.pie([pos, neg, neu],
-                labels=["Positive", "Negative", "Neutral"],
-                autopct="%1.1f%%",
-                startangle=90,
-                colors=["green", "red", "gray"])
-        ax2.set_title("Sentiment Analysis")
-        st.pyplot(fig2)
+            fig2, ax2 = plt.subplots()
+            ax2.pie([pos, neg, neu],
+                    labels=["Positive", "Negative", "Neutral"],
+                    autopct="%1.1f%%",
+                    startangle=90,
+                    colors=["green", "red", "gray"])
+            ax2.set_title("Sentiment Analysis")
+            st.pyplot(fig2)
 
-    import textblob
-    textblob.download_corpora()
+        except Exception as e:
+            st.error("⚠️ Sentiment analysis failed. Please ensure required corpora are available.")
+            st.text(str(e))
